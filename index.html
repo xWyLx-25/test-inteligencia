@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>¿Qué tan inteligente eres?</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(135deg, #141e30, #243b55);
+    color: white;
+    text-align: center;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #00c6ff;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0072ff;
+}
+
+.hidden { display: none; }
+
+.progress {
+    width: 100%;
+    background: #333;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    height: 10px;
+    background: #00ffcc;
+    width: 0%;
+    border-radius: 10px;
+}
+
+.timer {
+    font-size: 18px;
+    margin: 10px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>¿Qué tan tonto o inteligente eres?</h1>
+
+<div id="inicio">
+    <button onclick="mostrarNiveles()">Comenzar</button>
+</div>
+
+<div id="niveles" class="hidden">
+    <h2>Elige nivel</h2>
+    <button onclick="iniciar('tonto')">Tonto</button>
+    <button onclick="iniciar('medio')">Medio</button>
+    <button onclick="iniciar('inteligente')">Inteligente</button>
+</div>
+
+<div id="juego" class="hidden">
+    <div class="progress"><div class="progress-bar" id="barra"></div></div>
+    <div class="timer">Tiempo: <span id="tiempo">10</span></div>
+
+    <h2 id="pregunta"></h2>
+    <div id="respuestas"></div>
+</div>
+
+<div id="resultado" class="hidden">
+    <h2 id="final"></h2>
+    <button onclick="reiniciar()">Volver a jugar</button>
+</div>
+
+</div>
+
+<script>
+let preguntas = [];
+let actual = 0;
+let puntos = 0;
+let tiempo = 10;
+let intervalo;
+
+function mostrarNiveles(){
+    inicio.classList.add("hidden");
+    niveles.classList.remove("hidden");
+}
+
+function iniciar(nivel){
+    niveles.classList.add("hidden");
+    juego.classList.remove("hidden");
+
+    actual = 0;
+    puntos = 0;
+
+    preguntas = generarPreguntas(nivel);
+
+    siguiente();
+}
+
+function generarPreguntas(nivel){
+
+if(nivel==="tonto"){
+return [
+{p:"¿El agua moja?", r:["Sí","No","A veces"], c:0},
+{p:"¿El sol sale de noche?", r:["Sí","No","Depende"], c:1},
+{p:"¿2+2?", r:["3","4","5"], c:1},
+{p:"¿Los perros vuelan?", r:["Sí","No","Algunos"], c:1},
+{p:"¿El fuego quema?", r:["Sí","No","Solo frío"], c:0},
+{p:"¿La nieve es caliente?", r:["Sí","No","A veces"], c:1},
+{p:"¿El cielo es verde?", r:["Sí","No","Depende"], c:1},
+{p:"¿Comes piedras?", r:["Sí","No","A veces"], c:1},
+{p:"¿Un pez vive en agua?", r:["Sí","No","Tal vez"], c:0},
+{p:"¿La luna es de queso?", r:["Sí","No","Quizás"], c:1},
+{p:"¿Un carro camina?", r:["Sí","No","Depende"], c:1},
+{p:"¿Las vacas ladran?", r:["Sí","No","A veces"], c:1},
+{p:"¿El hielo quema?", r:["Sí","No","Depende"], c:1},
+{p:"¿Respiras aire?", r:["Sí","No","A veces"], c:0},
+{p:"¿Los gatos hablan?", r:["Sí","No","Tal vez"], c:1},
+{p:"¿El mar es seco?", r:["Sí","No","A veces"], c:1},
+{p:"¿El chocolate es salado?", r:["Sí","No","Depende"], c:1},
+{p:"¿Un árbol camina?", r:["Sí","No","Tal vez"], c:1},
+{p:"¿El sol es frío?", r:["Sí","No","Depende"], c:1},
+{p:"¿La tierra es plana?", r:["Sí","No","Tal vez"], c:1}
+];
+}
+
+if(nivel==="medio"){
+return [
+{p:"¿5x5?", r:["20","25","30"], c:1},
+{p:"Capital de Colombia?", r:["Bogotá","Lima","Quito"], c:0},
+{p:"¿10/2?", r:["2","5","10"], c:1},
+{p:"¿7+8?", r:["14","15","16"], c:1},
+{p:"¿Color del cielo?", r:["Azul","Rojo","Negro"], c:0},
+{p:"¿3x4?", r:["12","10","14"], c:0},
+{p:"¿Animal que ladra?", r:["Gato","Perro","Vaca"], c:1},
+{p:"¿8+2?", r:["9","10","11"], c:1},
+{p:"¿Mes con 28 días?", r:["Febrero","Todos","Ninguno"], c:1},
+{p:"¿Capital de Perú?", r:["Bogotá","Lima","Caracas"], c:1},
+{p:"¿9x9?", r:["81","72","99"], c:0},
+{p:"¿Planeta donde vivimos?", r:["Marte","Tierra","Venus"], c:1},
+{p:"¿12/3?", r:["3","4","5"], c:1},
+{p:"¿Color de la sangre?", r:["Rojo","Azul","Verde"], c:0},
+{p:"¿6x6?", r:["36","30","42"], c:0},
+{p:"¿Animal que vuela?", r:["Perro","Águila","Pez"], c:1},
+{p:"¿100-50?", r:["50","40","60"], c:0},
+{p:"¿Lengua que hablas?", r:["Español","Chino","Ruso"], c:0},
+{p:"¿4x3?", r:["12","10","14"], c:0},
+{p:"¿Día después de lunes?", r:["Martes","Domingo","Viernes"], c:0}
+];
+}
+
+if(nivel==="inteligente"){
+return [
+{p:"√144?", r:["10","12","14"], c:1},
+{p:"Autor de la relatividad?", r:["Newton","Einstein","Tesla"], c:1},
+{p:"Gas principal del aire?", r:["Oxígeno","Nitrógeno","CO2"], c:1},
+{p:"Capital de Japón?", r:["Seúl","Tokio","Pekín"], c:1},
+{p:"15x12?", r:["160","180","200"], c:1},
+{p:"Planeta más grande?", r:["Tierra","Júpiter","Marte"], c:1},
+{p:"Elemento H?", r:["Helio","Hidrógeno","Hierro"], c:1},
+{p:"Velocidad de la luz?", r:["300k km/s","150k","1M"], c:0},
+{p:"Idioma más hablado?", r:["Español","Inglés","Chino"], c:2},
+{p:"7^2?", r:["14","49","21"], c:1},
+{p:"Autor de Don Quijote?", r:["Cervantes","Shakespeare","Neruda"], c:0},
+{p:"Continente más grande?", r:["África","Asia","Europa"], c:1},
+{p:"π aprox?", r:["3.14","2.14","4.14"], c:0},
+{p:"Metal líquido?", r:["Oro","Mercurio","Plata"], c:1},
+{p:"100/4?", r:["20","25","30"], c:1},
+{p:"Año llegada a la luna?", r:["1969","1950","1980"], c:0},
+{p:"Órgano que bombea sangre?", r:["Pulmón","Corazón","Hígado"], c:1},
+{p:"País más grande?", r:["China","Rusia","USA"], c:1},
+{p:"5^3?", r:["125","25","75"], c:0},
+{p:"Lenguaje web principal?", r:["Python","HTML","C++"], c:1}
+];
+}
+
+}
+
+function siguiente(){
+    if(actual >= preguntas.length){
+        terminar();
+        return;
+    }
+
+    let p = preguntas[actual];
+    pregunta.innerText = p.p;
+
+    let html="";
+    p.r.forEach((resp,i)=>{
+        html += `<button onclick="responder(${i})">${resp}</button>`;
+    });
+
+    respuestas.innerHTML = html;
+
+    actualizarBarra();
+    iniciarTiempo();
+}
+
+function responder(i){
+    clearInterval(intervalo);
+
+    if(i === preguntas[actual].c){
+        puntos++;
+    }
+
+    actual++;
+    siguiente();
+}
+
+function iniciarTiempo(){
+    tiempo = 10;
+    document.getElementById("tiempo").innerText = tiempo;
+
+    intervalo = setInterval(()=>{
+        tiempo--;
+        document.getElementById("tiempo").innerText = tiempo;
+
+        if(tiempo<=0){
+            clearInterval(intervalo);
+            actual++;
+            siguiente();
+        }
+    },1000);
+}
+
+function actualizarBarra(){
+    let progreso = (actual / preguntas.length) * 100;
+    document.getElementById("barra").style.width = progreso + "%";
+}
+
+function terminar(){
+    juego.classList.add("hidden");
+    resultado.classList.remove("hidden");
+
+    let porcentaje = Math.round((puntos / preguntas.length) * 100);
+
+    let mensaje = porcentaje < 40 ? "💀 Muy tonto"
+                : porcentaje < 70 ? "😐 Promedio"
+                : "🧠 Inteligente";
+
+    final.innerText = `Resultado: ${porcentaje}%\n${mensaje}`;
+}
+
+function reiniciar(){
+    location.reload();
+}
+</script>
+
+</body>
+</html>
